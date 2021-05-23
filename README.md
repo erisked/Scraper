@@ -2,8 +2,8 @@
 Prereqs - Node js (https://nodejs.org/en/download/)
 
 Get -
-1) npm get cheerio
-2) npm get request
+1) npm i cheerio
+2) npm i request
 
 Run -
 1) node scrape.js
