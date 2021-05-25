@@ -21,13 +21,13 @@ class dbConnectionData {
         }); 
     }
 
-    function writeToDB (productRatingData, dbconnectiondata) {
+    function writeToDB (productRatingDatas, dbconnectiondata) {
         var url = dbconnectiondata.url;
         var MongoClient =  new mongodb.MongoClient(url, {useUnifiedTopology: true});
         MongoClient.connect(function(err, db) {
             var dbo = db.db(dbconnectiondata.DB);
-            var myobjs = [{ ProductName: productRatingData.name, description : productRatingData.description, noOfReviews :productRatingData.noOfReviews, averageRating : productRatingData.averageRating}];
-            dbo.collection(dbconnectiondata.Collection).insertMany(myobjs, function(err, res) {
+            // var myobjs = [{ name: productRatingData.name, description: productRatingData.description, noOfReviews: productRatingData.noOfReviews, averageRating: productRatingData.averageRating}];
+            dbo.collection(dbconnectiondata.Collection).insertMany(productRatingDatas, function(err, res) {
               if (err) throw err;
               console.log("1 document inserted");
               db.close(); 

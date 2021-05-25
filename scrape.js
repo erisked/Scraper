@@ -4,6 +4,8 @@ const dbhandler = require("./dbhandler");
 const wait=ms=>new Promise(resolve => setTimeout(resolve, ms));
 const pojo = require("./pojo");
 
+let dbConnectiondata = new dbhandler.dbConnectionData("mongodb://localhost:27017/","nodetest1", "newcollection");
+
 proceed = true;
 index  = 407;
 page = 1;
@@ -35,6 +37,7 @@ function getAllRatings_GoToNextPage_Iterate(link) {
     request(link, (error,
         response,html) => {
             if(!error && response.statusCode == 200) {
+                var myobjs = [];
                 // Print all search data ->
                 const $ = cheerio.load(html);
                 const searches = $(".s-result-item");
@@ -46,7 +49,16 @@ function getAllRatings_GoToNextPage_Iterate(link) {
                 itemName = $(item).find('span.a-size-base-plus.a-color-base.a-text-normal').text();
                 //itemName = $(item).find('span.a-size-medium.a-color-base.a-text-normal').text();
                 if(href!="" && itemName!="" && textReview.includes('stars'))
-                    console.log(page+" # "+itemName+" # "+href+" # "+textReview);
+                // 3.5 out of 5 stars 1,280
+                    var star = textReview.indexOf("stars");
+                    var res = textReview.substring(0, star+5);
+                    myobjs.push({page: page, 
+                        description: itemName, 
+                        href: href, averageRating: 
+                        textReview.substring(0, star+5), 
+                        noOfReviews:textReview.substring(star+5, textReview.length)
+                    });
+                    // console.log(page+" # "+itemName+" # "+href+" # "+textReview);
                 });
 
                 // Get next page link.
@@ -55,6 +67,7 @@ function getAllRatings_GoToNextPage_Iterate(link) {
                 nextpageref = "https://www.amazon.in"+nextpageref;
 
                 // DO it again!!
+                dbhandler.writeToDB(myobjs,dbConnectiondata);
                 page++;
                 wait(4*1000).then(() => getAllRatings_GoToNextPage_Iterate(nextpageref));
             }
@@ -89,11 +102,14 @@ function getAllRatings(link) {
 //printReviewDates(link);
 
 link = 'https://www.amazon.in/s?k=mens+trimmer&crid=18JSUM5K9RRFS&qid=1621790145&sprefix=mens+%2Caps%2C341&ref=sr_pg_1';
-//getAllRatings_GoToNextPage_Iterate(link);
+getAllRatings_GoToNextPage_Iterate(link);
 
-let dbConnectiondata = new dbhandler.dbConnectionData("mongodb://localhost:27017/","nodetest1", "newcollection");
-dbhandler.createCollection(dbConnectiondata);
-let obj = new pojo.productRatingData("lala","lulu",3,4);
-dbhandler.writeToDB(obj,dbConnectiondata);
+// let dbConnectiondata = new dbhandler.dbConnectionData("mongodb://localhost:27017/","nodetest1", "newcollection");
+// dbhandler.createCollection(dbConnectiondata);
+// let obj = new pojo.productRatingData("lala","lulu",3,4);
+// var myobj = {name: "1", description: "2", noOfReviews: "3", averageRating: "4"};
+// var myobjs = [];
+// myobjs.push(myobj);
+// dbhandler.writeToDB(myobjs,dbConnectiondata);
 //dbhandler.printFromDb();
 //getAllRatings(link);
