@@ -1,6 +1,8 @@
 const request = require('request');
 const cheerio = require('cheerio');
+const dbhandler = require("./dbhandler");
 const wait=ms=>new Promise(resolve => setTimeout(resolve, ms));
+const pojo = require("./pojo");
 
 proceed = true;
 index  = 407;
@@ -87,5 +89,11 @@ function getAllRatings(link) {
 //printReviewDates(link);
 
 link = 'https://www.amazon.in/s?k=mens+trimmer&crid=18JSUM5K9RRFS&qid=1621790145&sprefix=mens+%2Caps%2C341&ref=sr_pg_1';
-getAllRatings_GoToNextPage_Iterate(link);
+//getAllRatings_GoToNextPage_Iterate(link);
+
+let dbConnectiondata = new dbhandler.dbConnectionData("mongodb://localhost:27017/","nodetest1", "newcollection");
+dbhandler.createCollection(dbConnectiondata);
+let obj = new pojo.productRatingData("lala","lulu",3,4);
+dbhandler.writeToDB(obj,dbConnectiondata);
+//dbhandler.printFromDb();
 //getAllRatings(link);
