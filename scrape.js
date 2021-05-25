@@ -42,23 +42,28 @@ function getAllRatings_GoToNextPage_Iterate(link) {
                 const $ = cheerio.load(html);
                 const searches = $(".s-result-item");
                 searches.each((i, item) => {
-                // Find the text children
-                textReview = $(item).find('.a-row.a-size-small').text().replace(/\n/g,"");
-                //textReview.replace("Microsoft", "W3Schools");
-                href = $(item).find('h2.a-size-mini.a-spacing-none.a-color-base').find('a.a-link-normal.a-text-normal').attr("href");
-                itemName = $(item).find('span.a-size-base-plus.a-color-base.a-text-normal').text();
-                //itemName = $(item).find('span.a-size-medium.a-color-base.a-text-normal').text();
-                if(href!="" && itemName!="" && textReview.includes('stars'))
-                // 3.5 out of 5 stars 1,280
-                    var star = textReview.indexOf("stars");
-                    var res = textReview.substring(0, star+5);
-                    myobjs.push({page: page, 
-                        description: itemName, 
-                        href: href, averageRating: 
-                        textReview.substring(0, star+5), 
-                        noOfReviews:textReview.substring(star+5, textReview.length)
-                    });
-                    // console.log(page+" # "+itemName+" # "+href+" # "+textReview);
+                    // Find the text children
+                    textReview = $(item).find('.a-row.a-size-small').text().replace(/\n/g,"");
+                    //textReview.replace("Microsoft", "W3Schools");
+                    const href = $(item).find('h2.a-size-mini.a-spacing-none.a-color-base').find('a.a-link-normal.a-text-normal').attr("href");
+                    itemName = $(item).find('span.a-size-base-plus.a-color-base.a-text-normal').text();
+                    //itemName = $(item).find('span.a-size-medium.a-color-base.a-text-normal').text();
+                    if(href!="" && itemName!="" && textReview.includes('stars')) {
+                    // 3.5 out of 5 stars 1,280
+                        var hrefres = href.split("/");
+                        var star = textReview.indexOf("stars");
+                        var res = textReview.substring(0, star+5);
+                        if(hrefres.length >= 4 && hrefres[2]=='dp') {
+                            myobjs.push({page: page,
+                                name: hrefres[1],
+                                ASIN: hrefres[3],
+                                description: itemName, 
+                                href: href, 
+                                averageRating: textReview.substring(0, star+5), 
+                                noOfReviews:textReview.substring(star+5, textReview.length)
+                            });
+                        }
+                    }
                 });
 
                 // Get next page link.
